@@ -194,7 +194,6 @@ public class Search extends GridPane {
 			@Override
 			public void handle(ActionEvent e) {
 				Strain temp;
-//				if (!lineNumber.getText().isEmpty()) {
 				temp = new Strain(strainName.getText(),
 										genotype.getText(),
 										strainBackground.getText(),
@@ -210,23 +209,6 @@ public class Search extends GridPane {
 										result.getText(),
 										strainMaintenance.getText(),
 										expression.getText());
-//				} else {
-//					temp = new Strain(strainName.getText(),
-//							genotype.getText(),
-//							strainBackground.getText(),
-//							DNA.getText(),
-//							recordCreationDate.getText(),
-//							strainCreationDate.getText(),
-//							strainCreatedBy.getText(),
-//							location.getText(),
-//							newLocation.getText(),
-//							-1,
-//							notes.getText(),
-//							remarks.getText(),
-//							result.getText(),
-//							strainMaintenance.getText(),
-//							expression.getText());
-//				}
 				advancedQuery(temp);
 			}
 		});
@@ -248,9 +230,6 @@ public class Search extends GridPane {
 				strains = statement.executeQuery("SELECT * FROM entry");
 			else
 				strains = statement.executeQuery("SELECT * FROM entry WHERE strain_name LIKE '%" + s + "%'");
-
-			// while (strains.next())
-			// tree.getRoot().getChildren().add(new TreeItem<String>(strains.getString(i)));
 
 			ResultSetMetaData rsmd = strains.getMetaData();
 			int i = 1;
@@ -298,7 +277,7 @@ public class Search extends GridPane {
 			while (it1.hasNext() && it2.hasNext()) {
 				String column = it1.next(),
 						value = it2.next();
-				if (value != null || !value.isEmpty()) {
+				if (!(value == null || value.isEmpty())) {
 					System.out.println(value + " " + value.isEmpty());
 					if (first) {
 						query += column + " LIKE '%" + value + "%'";
