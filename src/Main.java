@@ -52,8 +52,6 @@ public class Main extends Application {
 		VBox sideBar = new VBox();
 
 		TabView tabs = new TabView();
-
-		SingleSelectionModel<Tab> selectionModel = tabs.getSelectionModel();
 		
 		TreeItem<String> root = new TreeItem<String>("Results");
 		Navigator navigation = new Navigator(root, tabs);
