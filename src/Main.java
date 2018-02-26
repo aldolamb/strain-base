@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -48,15 +49,109 @@ public class Main extends Application {
 		primaryStage.setHeight(bounds.getHeight());
 
 		SplitPane split = new SplitPane();
-
-		VBox sideBar = new VBox();
+		split.setDividerPositions(0.2f, 0.8f);
+		
+		SplitPane sideBar = new SplitPane();
+		sideBar.setOrientation(Orientation.VERTICAL);
 
 		TabView tabs = new TabView();
-		
-		TreeItem<String> root = new TreeItem<String>("Results");
-		Navigator navigation = new Navigator(root, tabs);
 
-		split.setDividerPositions(0.2f, 0.8f);
+		SingleSelectionModel<Tab> selectionModel = tabs.getSelectionModel();
+		
+		TreeItem<String> root = new TreeItem<String>("root");
+		// root.setExpanded(true);
+		Navigator navigation = new Navigator(root, tabs);
+		navigation.setShowRoot(false);
+//		TreeView<String> navigation = new TreeView<String>(root);
+//
+//		navigation.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//			@Override
+//			public void handle(MouseEvent mouseEvent) {
+//				if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+//					if (mouseEvent.getClickCount() == 2) {
+//						Node node = mouseEvent.getPickResult().getIntersectedNode();
+//						// Accept clicks only on node cells, and not on empty spaces of the TreeView
+//						if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)) {
+//							String name = (String) ((TreeItem) navigation.getSelectionModel().getSelectedItem())
+//									.getValue();
+//
+//							Connection connection = null;
+//							try {
+//								// create a database connection
+//								connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
+//
+//								Statement statement = connection.createStatement();
+//								statement.setQueryTimeout(30); // set timeout to 30 sec.
+//
+//								ResultSet resultSet = statement
+//										.executeQuery("SELECT * FROM entry WHERE strain_name = '" + name + "'");
+//
+//								StrainTab temp = new StrainTab(new Strain(resultSet));
+//								tabs.getTabs().add(temp);
+//								selectionModel.select(temp);
+//
+//							} catch (SQLException e) {
+//								System.err.println(e.getMessage());
+//							}
+//						}
+//					}
+//				} else if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
+//					// System.out.println("egg");
+//				}
+//			}
+//
+//		});
+//
+//		@SuppressWarnings("deprecation")
+//		ContextMenu rootContextMenu = ContextMenuBuilder.create()
+//				.items(MenuItemBuilder.create().text("View").onAction(new EventHandler<ActionEvent>() {
+//					@Override
+//					public void handle(ActionEvent arg0) {
+//						Connection connection = null;
+//						try {
+//							// create a database connection
+//							connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
+//
+//							Statement statement = connection.createStatement();
+//							statement.setQueryTimeout(30); // set timeout to 30 sec.
+//
+//							ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
+//									+ navigation.getSelectionModel().getSelectedItem().getValue() + "'");
+//
+//							StrainTab temp = new StrainTab(new Strain(resultSet), false);
+//							tabs.getTabs().add(temp);
+//							selectionModel.select(temp);
+//
+//						} catch (SQLException e) {
+//							System.err.println(e.getMessage());
+//						}
+//					}
+//				}).build(), MenuItemBuilder.create().text("Edit").onAction(new EventHandler<ActionEvent>() {
+//					@Override
+//					public void handle(ActionEvent arg0) {
+//						Connection connection = null;
+//						try {
+//							// create a database connection
+//							connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
+//
+//							Statement statement = connection.createStatement();
+//							statement.setQueryTimeout(30); // set timeout to 30 sec.
+//
+//							ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
+//									+ navigation.getSelectionModel().getSelectedItem().getValue() + "'");
+//
+//							StrainTab temp = new StrainTab(new Strain(resultSet), true);
+//							tabs.getTabs().add(temp);
+//							selectionModel.select(temp);
+//
+//						} catch (SQLException e) {
+//							System.err.println(e.getMessage());
+//						}
+//					}
+//				}).build()).build();
+//
+//		navigation.setContextMenu(rootContextMenu);
+
 
 		// try {
 		// Class.forName("org.sqlite.JDBC");
@@ -65,40 +160,6 @@ public class Main extends Application {
 		// e1.printStackTrace();
 		// }
 
-		Connection connection = null;
-		try {
-			// create a database connection
-			connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
-
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30); // set timeout to 30 sec.
-
-			ResultSet strains = statement.executeQuery("SELECT * FROM entry");
-			ResultSetMetaData rsmd = strains.getMetaData();
-			int i = 1;
-			while (strains.next()) {
-				TreeItem<String> temp = new TreeItem<String>(strains.getString(1));
-				int r = 1;
-				while (r++ < rsmd.getColumnCount()) {
-					String columnData = strains.getString(r);
-					if (columnData != null)
-						if (!columnData.isEmpty())
-							temp.getChildren().add(new TreeItem<String>(rsmd.getColumnName(r) + ": " + columnData));
-				}
-				navigation.getRoot().getChildren().add(temp);
-			}
-		}
-
-		catch (SQLException e) {
-			System.err.println(e.getMessage());
-		} finally {
-			try {
-				if (connection != null)
-					connection.close();
-			} catch (SQLException e) { // Use SQLException class instead.
-				System.err.println(e);
-			}
-		}
 		
 		tabs.prefHeightProperty().bind(split.prefHeightProperty());
 		ScrollPane scrollTabs = new ScrollPane(tabs);
@@ -111,12 +172,15 @@ public class Main extends Application {
 		scrollSideBar.prefWidthProperty().bind(sideBar.prefWidthProperty());
 		scrollSideBar.prefHeightProperty().bind(sideBar.heightProperty());
 		scrollSideBar.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
-
-		Search search = new Search(navigation);
+		
+		Search search = new Search(navigation.getRoot().getChildren().get(0), split, sideBar);
 
 		// Adds top and bottom to side bar
-		sideBar.getChildren().add(search);
-		sideBar.getChildren().add(scrollSideBar);
+		sideBar.getItems().add(search);
+		sideBar.getItems().add(scrollSideBar);
+
+		sideBar.setDividerPositions(0.01f, 0.99f);
+		sideBar.setResizableWithParent(sideBar.getItems().get(0), false);
 
 		// Adds left and right to split
 		split.getItems().add(sideBar);
@@ -131,16 +195,17 @@ public class Main extends Application {
 
 		split.setPrefSize(bounds.getMaxX(), bounds.getMaxY());
 		Scene scene = new Scene(c, bounds.getMaxX(), bounds.getMaxY());
-
-		scene.widthProperty().addListener(new ChangeListener<Number>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth,
-					Number newSceneWidth) {
-				split.setDividerPositions(0.2f, 0.8f);
-			}
-		});
-
+		
+		scene.widthProperty().addListener(new TestListener(sideBar, split));
+//		scene.widthProperty().addListener(new ChangeListener<Number>() {
+//
+//			@Override
+//			public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth,
+//					Number newSceneWidth) {
+//				split.setDividerPositions(0.3f, 0.7f);
+//			}
+//		});
+		
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

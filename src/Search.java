@@ -4,43 +4,34 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Iterator;
 
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.stage.Popup;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 
 public class Search extends GridPane {
 
-	TreeView<String> tree;
+	TreeItem<String> tree;
+	SplitPane split, sideBar;
+	ArrayList<String> entries = new ArrayList<String>();
 
-	public Search(TreeView<String> t) {
-		tree = t;
+	public Search(TreeItem<String> tree, SplitPane split, SplitPane sideBar) {
+		this.tree = tree;
+		this.split = split;
+		this.sideBar = sideBar;
 		minimize();
 	}
 
@@ -88,6 +79,10 @@ public class Search extends GridPane {
 			@Override
 			public void handle(ActionEvent e) {
 				getColumnConstraints().remove(0, getColumnConstraints().size());
+				split.setDividerPositions(0.35f, 0.65f);
+				sideBar.setDividerPositions(3.0/7, 4.0/7);
+				sideBar.setResizableWithParent(sideBar.getItems().get(0), true);
+				sideBar.setOrientation(Orientation.HORIZONTAL);
 				expand();
 			}
 		});
@@ -125,6 +120,10 @@ public class Search extends GridPane {
 			@Override
 			public void handle(ActionEvent e) {
 				getColumnConstraints().remove(0, getColumnConstraints().size());
+				split.setDividerPositions(0.2f, 0.8f);
+				sideBar.setDividerPositions(0.01f, 0.99f);
+				sideBar.setResizableWithParent(sideBar.getItems().get(0), false);
+				sideBar.setOrientation(Orientation.VERTICAL);
 				minimize();
 			}
 		});
@@ -177,11 +176,11 @@ public class Search extends GridPane {
 		result.setPromptText("Result");
 		this.add(result, 0, r++, 2, 1);
 		
-		TextArea strainMaintenance = new TextArea("");
+		TextField strainMaintenance = new TextField("");
 		strainMaintenance.setPromptText("Expression");
 		this.add(strainMaintenance, 0, r++, 2, 1);
 
-		TextArea expression = new TextArea("");
+		TextField expression = new TextField("");
 		expression.setPromptText("Expression");
 		this.add(expression, 0, r++, 2, 1);
 
@@ -215,7 +214,8 @@ public class Search extends GridPane {
 	}
 
 	public void query(String s) {
-		tree.getRoot().getChildren().clear();
+		tree.getChildren().clear();
+		tree.setExpanded(true);
 
 		Connection connection = null;
 		try {
@@ -242,7 +242,7 @@ public class Search extends GridPane {
 						if (!columnData.isEmpty())
 							temp.getChildren().add(new TreeItem<String>(rsmd.getColumnName(r) + ": " + columnData));
 				}
-				tree.getRoot().getChildren().add(temp);
+				tree.getChildren().add(temp);
 			}
 		}
 
@@ -259,7 +259,8 @@ public class Search extends GridPane {
 	}
 	
 	public void advancedQuery(Strain s) {
-		tree.getRoot().getChildren().clear();
+		tree.getChildren().clear();
+		tree.setExpanded(true);
 		
 		Connection connection = null;
 		try {
@@ -306,7 +307,7 @@ public class Search extends GridPane {
 						if (!columnData.isEmpty())
 							temp.getChildren().add(new TreeItem<String>(rsmd.getColumnName(r) + ": " + columnData));
 				}
-				tree.getRoot().getChildren().add(temp);
+				tree.getChildren().add(temp);
 			}
 		}
 
