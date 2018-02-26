@@ -5,15 +5,15 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-public class TestListener implements ChangeListener<Number> {
+public class PageSizeListener implements ChangeListener<Number> {
 
-	public static final float RIGHT_PANE_NORMAL_SETTING = .3f, LEFT_PANE_NORMAL_SETTING = .8f,
+	public static final float RIGHT_PANE_NORMAL_SETTING = .35f, LEFT_PANE_NORMAL_SETTING = .65f,
 			RIGHT_PANE_CONDENSED_SETTING = .2f, LEFT_PANE_CONDENSED_SETTING = .8f;
 
 	SplitPane pane;
 	SplitPane split;
 
-	public TestListener(SplitPane pane, SplitPane split) {
+	public PageSizeListener(SplitPane pane, SplitPane split) {
 		this.pane = pane;
 		this.split = split;
 	}
