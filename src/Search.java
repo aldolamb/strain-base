@@ -92,7 +92,7 @@ public class Search extends GridPane {
 				getColumnConstraints().remove(0, getColumnConstraints().size());
 				split.setDividerPositions(0.35f, 0.65f);
 				sideBar.setDividerPositions(3.0 / 7, 4.0 / 7);
-				sideBar.setResizableWithParent(sideBar.getItems().get(0), true);
+				SplitPane.setResizableWithParent(sideBar.getItems().get(0), true);
 				sideBar.setOrientation(Orientation.HORIZONTAL);
 				expand();
 			}
@@ -140,7 +140,7 @@ public class Search extends GridPane {
 				getColumnConstraints().remove(0, getColumnConstraints().size());
 				split.setDividerPositions(0.2f, 0.8f);
 				sideBar.setDividerPositions(0.01f, 0.99f);
-				sideBar.setResizableWithParent(sideBar.getItems().get(0), false);
+				SplitPane.setResizableWithParent(sideBar.getItems().get(0), false);
 				sideBar.setOrientation(Orientation.VERTICAL);
 				minimize();
 			}

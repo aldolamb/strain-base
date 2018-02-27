@@ -1,8 +1,7 @@
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ContextMenuBuilder;
-import javafx.scene.control.MenuItemBuilder;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -14,38 +13,47 @@ public class TabView extends TabPane {
 		
 		SingleSelectionModel<Tab> selectionModel = getSelectionModel();
 
-		@SuppressWarnings("deprecation")
-		ContextMenu tabContextMenu = ContextMenuBuilder.create()
-				.items(MenuItemBuilder.create().text("New").onAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-						StrainTab newTab = new StrainTab();
-						getTabs().add(newTab);
-						selectionModel.select(newTab);
-					}
-				}).build(), MenuItemBuilder.create().text("Open").onAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-
-					}
-				}).build(), MenuItemBuilder.create().text("Close").onAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-						getTabs().remove(selectionModel.getSelectedIndex());
-					}
-				}).build(), MenuItemBuilder.create().text("Close All").onAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-						getTabs().clear();
-					}
-				}).build(), MenuItemBuilder.create().text("Cancel").onAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-
-						System.out.println(getHeight() + " " + getWidth());
-					}
-				}).build()).build();
-
+		final ContextMenu tabContextMenu = new ContextMenu();
+		
+		MenuItem tNew = new MenuItem("New");
+		tNew.setOnAction(new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+				StrainTab newTab = new StrainTab();
+				getTabs().add(newTab);
+				selectionModel.select(newTab);
+		    }
+		});
+		
+		MenuItem tOpen = new MenuItem("Open");
+		tOpen.setOnAction(new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+		        System.out.println("Preferences");
+		    }
+		});
+		
+		MenuItem tClose = new MenuItem("Close");
+		tClose.setOnAction(new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+				getTabs().remove(selectionModel.getSelectedIndex());
+		    }
+		});
+		
+		MenuItem tCloseAll = new MenuItem("Close All");
+		tCloseAll.setOnAction(new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+				getTabs().clear();
+		    }
+		});
+		
+		MenuItem tCancel = new MenuItem("Cancel");
+		tCancel.setOnAction(new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+				getTabs().clear();
+		    }
+		});
+		
+		tabContextMenu.getItems().addAll(tNew, tOpen, tClose, tCloseAll, tCancel);
+		
 		setContextMenu(tabContextMenu);
 	}
 }

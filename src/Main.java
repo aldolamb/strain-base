@@ -16,7 +16,6 @@ import javafx.scene.input.KeyEvent;
 public class Main extends Application {
 	public static void main(String[] args) {
 		launch(args);
-
 	}
 
 	@Override
@@ -38,8 +37,7 @@ public class Main extends Application {
 
 		TabView tabs = new TabView();
 
-		TreeItem<String> root = new TreeItem<String>("root");
-		Navigator navigation = new Navigator(root, tabs);
+		Navigator navigation = new Navigator(new TreeItem<String>("root"), tabs);
 		navigation.setShowRoot(false);
 
 		// try {
@@ -48,7 +46,7 @@ public class Main extends Application {
 		// // TODO Auto-generated catch block
 		// e1.printStackTrace();
 		// }
-
+		
 		tabs.prefHeightProperty().bind(split.prefHeightProperty());
 		ScrollPane scrollTabs = new ScrollPane(tabs);
 		scrollTabs.setFitToWidth(true);
@@ -68,7 +66,7 @@ public class Main extends Application {
 		sideBar.getItems().add(scrollSideBar);
 
 		sideBar.setDividerPositions(0.01f, 0.99f);
-		sideBar.setResizableWithParent(sideBar.getItems().get(0), false);
+		SplitPane.setResizableWithParent(sideBar.getItems().get(0), false);
 
 		// Adds left and right to split
 		split.getItems().add(sideBar);
@@ -76,7 +74,7 @@ public class Main extends Application {
 
 		VBox c = new VBox();
 
-		MenuOptions menu = new MenuOptions(tabs);
+		MenuOptions menu = new MenuOptions(tabs, primaryStage);
 
 		c.getChildren().addAll(menu);
 		c.getChildren().addAll(split);
@@ -87,12 +85,18 @@ public class Main extends Application {
 		scene.widthProperty().addListener(new PageSizeListener(sideBar, split));
 
 		final KeyCombination keyCombinationShiftC = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
+		final KeyCombination keyCombinationShiftN = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
 
 		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
 				if (keyCombinationShiftC.match(event))
 					tabs.getTabs().remove(tabs.getSelectionModel().getSelectedIndex());
+				else if (keyCombinationShiftN.match(event)) {
+					StrainTab newTab = new StrainTab();
+					tabs.getTabs().add(newTab);
+					tabs.getSelectionModel().select(newTab);
+				}
 			}
 		});
 

@@ -9,8 +9,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ContextMenuBuilder;
-import javafx.scene.control.MenuItemBuilder;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TreeCell;
@@ -22,6 +22,7 @@ import javafx.scene.text.Text;
 
 public class Navigator extends TreeView<String> {
 
+	@SuppressWarnings("unchecked")
 	public Navigator(TreeItem<String> ti, TabView tabs) {
 		super(ti);
 
@@ -37,6 +38,10 @@ public class Navigator extends TreeView<String> {
 
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30); // set timeout to 30 sec.
+
+			ResultSet strainsDate = statement.executeQuery("SELECT DISTINCT strain_creation_date FROM entry");
+			while (strainsDate.next())
+				System.out.println(strainsDate.getString(1));
 
 			ResultSet strains = statement.executeQuery("SELECT * FROM entry");
 			ResultSetMetaData rsmd = strains.getMetaData();
@@ -60,8 +65,7 @@ public class Navigator extends TreeView<String> {
 				Statement statement2 = connection.createStatement();
 				statement2.setQueryTimeout(30); // set timeout to 30 sec.
 				String test = "SELECT * FROM entry WHERE strain_created_by = '" + uniqueLab.getString(1) + "'";
-				ResultSet memberInfo = statement2
-						.executeQuery(test);
+				ResultSet memberInfo = statement2.executeQuery(test);
 				ResultSetMetaData rsmd2 = memberInfo.getMetaData();
 				while (memberInfo.next()) {
 					TreeItem<String> currStrain = new TreeItem<String>(memberInfo.getString(1));
@@ -100,8 +104,8 @@ public class Navigator extends TreeView<String> {
 					if (mouseEvent.getClickCount() == 2) {
 						Node node = mouseEvent.getPickResult().getIntersectedNode();
 						// Accept clicks only on node cells, and not on empty spaces of the TreeView
-						if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)) {
-							String name = (String) ((TreeItem) getSelectionModel().getSelectedItem()).getValue();
+						if (node instanceof Text || (node instanceof TreeCell && ((Labeled) node).getText() != null)) {
+							String name = (String) getSelectionModel().getSelectedItem().getValue();
 
 							Connection connection = null;
 							try {
@@ -130,78 +134,82 @@ public class Navigator extends TreeView<String> {
 
 		});
 
-		@SuppressWarnings("deprecation")
-		ContextMenu rootContextMenu = ContextMenuBuilder.create()
-				.items(MenuItemBuilder.create().text("View").onAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-						Connection connection = null;
-						try {
-							// create a database connection
-							connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
+		final ContextMenu rootContextMenu = new ContextMenu();
 
-							Statement statement = connection.createStatement();
-							statement.setQueryTimeout(30); // set timeout to 30 sec.
+		MenuItem view = new MenuItem("View");
+		view.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				Connection connection = null;
+				try {
+					// create a database connection
+					connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
 
-							ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
-									+ ((TreeItem) getSelectionModel().getSelectedItem()).getValue() + "'");
+					Statement statement = connection.createStatement();
+					statement.setQueryTimeout(30); // set timeout to 30 sec.
 
-							Strain result = new Strain(resultSet);
-							String resultName = result.get(result.getKeys().get(0));
-							boolean found = false;
-							for (Tab tab : tabs.getTabs()) {
-								if (tab.getText().equals(resultName)) {
-									found = true;
-									((StrainTab) tab).readOnly();
-									selectionModel.select(tab);
-								}
-							}
+					ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
+							+ getSelectionModel().getSelectedItem().getValue() + "'");
 
-							if (!found) {
-								StrainTab newTab = new StrainTab(result, false);
-								tabs.getTabs().add(newTab);
-								selectionModel.select(newTab);
-							}
-						} catch (SQLException e) {
-							System.err.println(e.getMessage());
+					Strain result = new Strain(resultSet);
+					String resultName = result.get(result.getKeys().get(0));
+					boolean found = false;
+					for (Tab tab : tabs.getTabs()) {
+						if (tab.getText().equals(resultName)) {
+							found = true;
+							((StrainTab) tab).readOnly();
+							selectionModel.select(tab);
 						}
 					}
-				}).build(), MenuItemBuilder.create().text("Edit").onAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-						Connection connection = null;
-						try {
-							// create a database connection
-							connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
 
-							Statement statement = connection.createStatement();
-							statement.setQueryTimeout(30); // set timeout to 30 sec.
+					if (!found) {
+						StrainTab newTab = new StrainTab(result, false);
+						tabs.getTabs().add(newTab);
+						selectionModel.select(newTab);
+					}
+				} catch (SQLException e1) {
+					System.err.println(e1.getMessage());
+				}
+			}
+		});
 
-							ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
-									+ ((TreeItem) getSelectionModel().getSelectedItem()).getValue() + "'");
+		MenuItem edit = new MenuItem("Edit");
+		edit.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				Connection connection = null;
+				try {
+					// create a database connection
+					connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
 
-							Strain result = new Strain(resultSet);
-							String resultName = result.get(result.getKeys().get(0));
-							boolean found = false;
-							for (Tab tab : tabs.getTabs()) {
-								if (tab.getText().equals(resultName)) {
-									found = true;
-									((StrainTab) tab).writable();
-									selectionModel.select(tab);
-								}
-							}
+					Statement statement = connection.createStatement();
+					statement.setQueryTimeout(30); // set timeout to 30 sec.
 
-							if (!found) {
-								StrainTab newTab = new StrainTab(result, true);
-								tabs.getTabs().add(newTab);
-								selectionModel.select(newTab);
-							}
+					ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
+							+ getSelectionModel().getSelectedItem().getValue() + "'");
 
-						} catch (SQLException e) {
-							System.err.println(e.getMessage());
+					Strain result = new Strain(resultSet);
+					String resultName = result.get(result.getKeys().get(0));
+					boolean found = false;
+					for (Tab tab : tabs.getTabs()) {
+						if (tab.getText().equals(resultName)) {
+							found = true;
+							((StrainTab) tab).writable();
+							selectionModel.select(tab);
 						}
 					}
-				}).build()).build();
+
+					if (!found) {
+						StrainTab newTab = new StrainTab(result, true);
+						tabs.getTabs().add(newTab);
+						selectionModel.select(newTab);
+					}
+
+				} catch (SQLException e1) {
+					System.err.println(e1.getMessage());
+				}
+			}
+		});
+
+		rootContextMenu.getItems().addAll(view, edit);
 
 		setContextMenu(rootContextMenu);
 	}
