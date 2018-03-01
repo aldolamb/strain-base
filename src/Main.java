@@ -22,6 +22,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("JavaFX Welcome");
 
+		// Get screen dimensions, set program to fullscreen
 		Screen screen = Screen.getPrimary();
 		Rectangle2D bounds = screen.getVisualBounds();
 		primaryStage.setX(bounds.getMinX());
@@ -29,6 +30,10 @@ public class Main extends Application {
 		primaryStage.setWidth(bounds.getWidth());
 		primaryStage.setHeight(bounds.getHeight());
 
+		// Potential login, will require username and password 
+		// 		- will also take database choice
+		//		new Login();
+		
 		SplitPane split = new SplitPane();
 		split.setDividerPositions(0.2f, 0.8f);
 

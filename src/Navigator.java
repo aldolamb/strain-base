@@ -39,15 +39,11 @@ public class Navigator extends TreeView<String> {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30); // set timeout to 30 sec.
 
-			ResultSet strainsDate = statement.executeQuery("SELECT DISTINCT strain_creation_date FROM entry");
-			while (strainsDate.next())
-				System.out.println(strainsDate.getString(1));
-
 			ResultSet strains = statement.executeQuery("SELECT * FROM entry");
 			ResultSetMetaData rsmd = strains.getMetaData();
 
 			while (strains.next()) {
-				TreeItem<String> temp = new TreeItem<String>(strains.getString(1));
+				StrainTreeItem temp = new StrainTreeItem(strains.getString(1));
 				int r = 1;
 				while (r++ < rsmd.getColumnCount()) {
 					String columnData = strains.getString(r);
@@ -68,7 +64,7 @@ public class Navigator extends TreeView<String> {
 				ResultSet memberInfo = statement2.executeQuery(test);
 				ResultSetMetaData rsmd2 = memberInfo.getMetaData();
 				while (memberInfo.next()) {
-					TreeItem<String> currStrain = new TreeItem<String>(memberInfo.getString(1));
+					StrainTreeItem currStrain = new StrainTreeItem(memberInfo.getString(1));
 					int r = 1;
 					while (r++ < rsmd2.getColumnCount()) {
 						String columnData = memberInfo.getString(r);
@@ -127,11 +123,8 @@ public class Navigator extends TreeView<String> {
 							}
 						}
 					}
-				} else if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
-					// System.out.println("egg");
 				}
 			}
-
 		});
 
 		final ContextMenu rootContextMenu = new ContextMenu();
@@ -139,35 +132,37 @@ public class Navigator extends TreeView<String> {
 		MenuItem view = new MenuItem("View");
 		view.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				Connection connection = null;
-				try {
-					// create a database connection
-					connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
+				if (getSelectionModel().getSelectedItem() instanceof StrainTreeItem) {
+					Connection connection = null;
+					try {
+						// create a database connection
+						connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
 
-					Statement statement = connection.createStatement();
-					statement.setQueryTimeout(30); // set timeout to 30 sec.
+						Statement statement = connection.createStatement();
+						statement.setQueryTimeout(30); // set timeout to 30 sec.
 
-					ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
-							+ getSelectionModel().getSelectedItem().getValue() + "'");
+						ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
+								+ getSelectionModel().getSelectedItem().getValue() + "'");
 
-					Strain result = new Strain(resultSet);
-					String resultName = result.get(result.getKeys().get(0));
-					boolean found = false;
-					for (Tab tab : tabs.getTabs()) {
-						if (tab.getText().equals(resultName)) {
-							found = true;
-							((StrainTab) tab).readOnly();
-							selectionModel.select(tab);
+						Strain result = new Strain(resultSet);
+						String resultName = result.get(result.getKeys().get(0));
+						boolean found = false;
+						for (Tab tab : tabs.getTabs()) {
+							if (tab.getText().equals(resultName)) {
+								found = true;
+								((StrainTab) tab).readOnly();
+								selectionModel.select(tab);
+							}
 						}
-					}
 
-					if (!found) {
-						StrainTab newTab = new StrainTab(result, false);
-						tabs.getTabs().add(newTab);
-						selectionModel.select(newTab);
+						if (!found) {
+							StrainTab newTab = new StrainTab(result, false);
+							tabs.getTabs().add(newTab);
+							selectionModel.select(newTab);
+						}
+					} catch (SQLException e1) {
+						System.err.println(e1.getMessage());
 					}
-				} catch (SQLException e1) {
-					System.err.println(e1.getMessage());
 				}
 			}
 		});
@@ -175,36 +170,38 @@ public class Navigator extends TreeView<String> {
 		MenuItem edit = new MenuItem("Edit");
 		edit.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				Connection connection = null;
-				try {
-					// create a database connection
-					connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
+				if (getSelectionModel().getSelectedItem() instanceof StrainTreeItem) {
+					Connection connection = null;
+					try {
+						// create a database connection
+						connection = DriverManager.getConnection("jdbc:sqlite:full_records.db");
 
-					Statement statement = connection.createStatement();
-					statement.setQueryTimeout(30); // set timeout to 30 sec.
+						Statement statement = connection.createStatement();
+						statement.setQueryTimeout(30); // set timeout to 30 sec.
 
-					ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
-							+ getSelectionModel().getSelectedItem().getValue() + "'");
+						ResultSet resultSet = statement.executeQuery("SELECT * FROM entry WHERE strain_name = '"
+								+ getSelectionModel().getSelectedItem().getValue() + "'");
 
-					Strain result = new Strain(resultSet);
-					String resultName = result.get(result.getKeys().get(0));
-					boolean found = false;
-					for (Tab tab : tabs.getTabs()) {
-						if (tab.getText().equals(resultName)) {
-							found = true;
-							((StrainTab) tab).writable();
-							selectionModel.select(tab);
+						Strain result = new Strain(resultSet);
+						String resultName = result.get(result.getKeys().get(0));
+						boolean found = false;
+						for (Tab tab : tabs.getTabs()) {
+							if (tab.getText().equals(resultName)) {
+								found = true;
+								((StrainTab) tab).writable();
+								selectionModel.select(tab);
+							}
 						}
-					}
 
-					if (!found) {
-						StrainTab newTab = new StrainTab(result, true);
-						tabs.getTabs().add(newTab);
-						selectionModel.select(newTab);
-					}
+						if (!found) {
+							StrainTab newTab = new StrainTab(result, true);
+							tabs.getTabs().add(newTab);
+							selectionModel.select(newTab);
+						}
 
-				} catch (SQLException e1) {
-					System.err.println(e1.getMessage());
+					} catch (SQLException e1) {
+						System.err.println(e1.getMessage());
+					}
 				}
 			}
 		});
@@ -213,5 +210,4 @@ public class Navigator extends TreeView<String> {
 
 		setContextMenu(rootContextMenu);
 	}
-
 }
