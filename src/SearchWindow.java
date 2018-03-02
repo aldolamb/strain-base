@@ -8,6 +8,19 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+/**
+ * <h1>SearchWindow</h1> Unused class for a potential Search Window view instead
+ * of the simpler Search class's display.
+ * <p>
+ * Kept for reference and potential implementation.
+ * <p>
+ * <b>Note:</b> Old; code lacks building complexity of other classes
+ *
+ * @author John Aldo Lamberti
+ * @see Search
+ * @version 1.0
+ * @since 03-01-2018
+ */
 public class SearchWindow extends Stage {
 
 	public SearchWindow(Stage mainStage) {
@@ -22,7 +35,7 @@ public class SearchWindow extends Stage {
 		this.setResizable(false);
 		this.initOwner(mainStage);
 		this.setAlwaysOnTop(true);
-		
+
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
@@ -45,7 +58,7 @@ public class SearchWindow extends Stage {
 		grid.getColumnConstraints().add(0, column1);
 		grid.getColumnConstraints().add(1, new ColumnConstraints());
 		grid.getColumnConstraints().add(2, column2);
-		
+
 		TextField genotypeField = new TextField("");
 		genotypeField.setPromptText("Genotype");
 		grid.add(genotypeField, 0, 0);
@@ -78,7 +91,6 @@ public class SearchWindow extends Stage {
 		newLocationField.setPromptText("New Location");
 		grid.add(newLocationField, 0, 7);
 
-
 		TextField lineNumberField = new TextField("");
 		lineNumberField.setPromptText("Line Number");
 		grid.add(lineNumberField, 0, 8);
@@ -95,18 +107,17 @@ public class SearchWindow extends Stage {
 		resultField.setPromptText("Result");
 		grid.add(resultField, 0, 11);
 
-//		Label strainMaintenance = new Label("Strain Maintenance:");
-//		grid.add(strainMaintenance, 0, 7);
-//
-//		TextField strainMaintenanceField = new TextField("");
-//		grid.add(strainMaintenanceField, 1, 7);
-		
-//		TextField expressionField = new TextField("");
+		// Label strainMaintenance = new Label("Strain Maintenance:");
+		// grid.add(strainMaintenance, 0, 7);
+		//
+		// TextField strainMaintenanceField = new TextField("");
+		// grid.add(strainMaintenanceField, 1, 7);
+
+		// TextField expressionField = new TextField("");
 		TextArea expressionField = new TextArea("");
 		expressionField.setPromptText("Expression");
 		grid.add(expressionField, 1, 12, 1, 2);
 
-		
 		this.show();
 	}
 }

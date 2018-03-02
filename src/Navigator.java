@@ -20,16 +20,39 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 
+/**
+ * <h1>Navigator</h1> The list database view of the application. Allows for
+ * viewing of - Search Results - Full Records - Lab Members Search results can
+ * be found here and opened by a double or right mouse click.
+ * <p>
+ * <b>Note:</b> Will eventually add dynamic right clicking based on class of
+ * tree item selected.
+ *
+ * @author John Aldo Lamberti
+ * @version 1.0
+ * @since 03-01-2018
+ */
 public class Navigator extends TreeView<String> {
 
+	/**
+	 * Creates a Navigator (TreeView) with a given TabView where StrainTabs can be
+	 * sent.
+	 * <p>
+	 * 
+	 * @param tabs
+	 *            TabView where StrainTabs can be sent.
+	 * @see TabView
+	 * @see StrainTab
+	 */
 	@SuppressWarnings("unchecked")
-	public Navigator(TreeItem<String> ti, TabView tabs) {
-		super(ti);
+	public Navigator(TabView tabs) {
+		super(new TreeItem<String>("root"));
 
+		// Second layer nodes: visible roots
 		TreeItem<String> searchResults = new TreeItem<String>("Search Results");
 		TreeItem<String> fullRecords = new TreeItem<String>("Full Records");
 		TreeItem<String> labMembers = new TreeItem<String>("Lab Members");
-		ti.getChildren().addAll(searchResults, fullRecords, labMembers);
+		getRoot().getChildren().addAll(searchResults, fullRecords, labMembers);
 
 		Connection connection = null;
 		try {
@@ -127,8 +150,6 @@ public class Navigator extends TreeView<String> {
 			}
 		});
 
-		final ContextMenu rootContextMenu = new ContextMenu();
-
 		MenuItem view = new MenuItem("View");
 		view.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
@@ -206,8 +227,8 @@ public class Navigator extends TreeView<String> {
 			}
 		});
 
+		final ContextMenu rootContextMenu = new ContextMenu();
 		rootContextMenu.getItems().addAll(view, edit);
-
 		setContextMenu(rootContextMenu);
 	}
 }

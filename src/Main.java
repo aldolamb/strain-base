@@ -30,10 +30,10 @@ public class Main extends Application {
 		primaryStage.setWidth(bounds.getWidth());
 		primaryStage.setHeight(bounds.getHeight());
 
-		// Potential login, will require username and password 
-		// 		- will also take database choice
-		//		new Login();
-		
+		// Potential login, will require username and password
+		// - will also take database choice
+		// new Login();
+
 		SplitPane split = new SplitPane();
 		split.setDividerPositions(0.2f, 0.8f);
 
@@ -42,7 +42,7 @@ public class Main extends Application {
 
 		TabView tabs = new TabView();
 
-		Navigator navigation = new Navigator(new TreeItem<String>("root"), tabs);
+		Navigator navigation = new Navigator(tabs);
 		navigation.setShowRoot(false);
 
 		// try {
@@ -51,7 +51,7 @@ public class Main extends Application {
 		// // TODO Auto-generated catch block
 		// e1.printStackTrace();
 		// }
-		
+
 		tabs.prefHeightProperty().bind(split.prefHeightProperty());
 		ScrollPane scrollTabs = new ScrollPane(tabs);
 		scrollTabs.setFitToWidth(true);

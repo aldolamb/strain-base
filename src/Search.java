@@ -23,6 +23,16 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
+/**
+ * <h1>Search</h1> Search Bar. Provides simple and advanced search. Runs
+ * queries.
+ * <p>
+ * <b>Note:</b> N/A
+ *
+ * @author John Aldo Lamberti
+ * @version 1.0
+ * @since 03-01-2018
+ */
 public class Search extends GridPane {
 
 	TreeItem<String> tree;
@@ -30,6 +40,20 @@ public class Search extends GridPane {
 	Strain data;
 	List<TextField> fields;
 
+	/**
+	 * Creates a Search area to add items to the Navigation tree.
+	 * <p>
+	 * 
+	 * @see Navigation
+	 * @param tree
+	 *            TreeView for outputing results (Navigation)
+	 * @param split
+	 *            SplitPane accessed for changing divider positions on change of
+	 *            search complexity
+	 * @param sideBar
+	 *            SplitPane accessed for changing divider positions on change of
+	 *            search complexity
+	 */
 	public Search(TreeItem<String> tree, SplitPane split, SplitPane sideBar) {
 		this.tree = tree;
 		this.split = split;
@@ -46,6 +70,11 @@ public class Search extends GridPane {
 		minimize();
 	}
 
+	/**
+	 * Minimized search and navigation view.
+	 * <p>
+	 * Contains simple search view.
+	 */
 	public void minimize() {
 		this.getChildren().clear();
 
@@ -99,6 +128,11 @@ public class Search extends GridPane {
 		});
 	}
 
+	/**
+	 * Expanded search and navigation view.
+	 * <p>
+	 * Contains advanced search view.
+	 */
 	public void expand() {
 		this.getChildren().clear();
 
@@ -163,6 +197,13 @@ public class Search extends GridPane {
 		});
 	}
 
+	/**
+	 * Simple query that takes one parameter.
+	 * <p>
+	 * 
+	 * @param s
+	 *            String to construct query from.
+	 */
 	public void query(String s) {
 		tree.getChildren().clear();
 		for (TreeItem<String> temp : tree.getParent().getChildren())
@@ -211,11 +252,18 @@ public class Search extends GridPane {
 		}
 	}
 
-	public void advancedQuery(Strain s) {
+	/**
+	 * Advanced query that takes a Strain.
+	 * <p>
+	 * 
+	 * @param strain
+	 *            Strain to construct query from.
+	 */
+	public void advancedQuery(Strain strain) {
 		tree.getChildren().clear();
 		for (TreeItem<String> temp : tree.getParent().getChildren())
 			temp.setExpanded(false);
-		if (!s.isEmpty()) {
+		if (!strain.isEmpty()) {
 			tree.setExpanded(true);
 			Connection connection = null;
 			try {
@@ -227,8 +275,8 @@ public class Search extends GridPane {
 
 				String query = "SELECT * FROM entry WHERE ";
 				boolean first = true;
-				for (String key : s.getKeys()) {
-					String value = s.get(key);
+				for (String key : strain.getKeys()) {
+					String value = strain.get(key);
 					if (!(value == null || value.isEmpty())) {
 						if (first) {
 							query += key + " LIKE '%" + value + "%'";
