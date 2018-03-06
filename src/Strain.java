@@ -1,5 +1,7 @@
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +18,7 @@ import java.util.List;
  */
 public class Strain {
 
-	private List<String> keys = Arrays.asList("strain_name", "genotype", "strain_background", "DNA_on_array",
-			"record_creation_date", "strain_creation_date", "strain_created_by", "location", "new_location",
-			"line_number", "notes", "remarks", "result", "strain_maintenance", "expression");
+	private List<String> keys;
 	private HashMap<String, String> data;
 
 	/**
@@ -28,7 +28,12 @@ public class Strain {
 	 */
 	public Strain() {
 		data = new HashMap<String, String>();
+		keys = new ArrayList<String>();
 
+		keys = Arrays.asList("strain_name", "genotype", "strain_background", "DNA_on_array",
+				"record_creation_date", "strain_creation_date", "strain_created_by", "location", "new_location",
+				"line_number", "notes", "remarks", "result", "strain_maintenance", "expression");
+		
 		for (String key : keys)
 			data.put(key, "");
 	}
@@ -42,8 +47,16 @@ public class Strain {
 	 * @throws SQLException
 	 * @see ResultSet
 	 */
+	@SuppressWarnings("unchecked")
 	public Strain(ResultSet resultSet) throws SQLException {
 		data = new HashMap<String, String>();
+		keys = new ArrayList<String>();
+		
+		System.out.println("before");
+		ResultSetMetaData rsmd = resultSet.getMetaData();
+		for (int i = 1; i <= rsmd.getColumnCount(); i++)
+			keys.add(rsmd.getColumnName(i));
+		System.out.println("after");
 
 		for (String key : keys) {
 			String value = resultSet.getString(key);
